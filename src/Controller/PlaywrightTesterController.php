@@ -22,7 +22,6 @@ class PlaywrightTesterController extends ControllerBase {
       ->execute()
       ->fetchAll();
 
-    // Convert to arrays for Twig.
     $files = [];
     foreach ($results as $row) {
       $files[] = [
@@ -53,6 +52,22 @@ class PlaywrightTesterController extends ControllerBase {
     }
 
     $db = \Drupal::database();
+
+    // Check if filename already exists.
+    $existing = $db->select('playwright_tester_files', 'p')
+      ->fields('p', ['id'])
+      ->condition('filename', $data['filename'])
+      ->execute()
+      ->fetchObject();
+
+    if ($existing) {
+      return new JsonResponse([
+        'error'     => 'duplicate',
+        'message'   => 'This file is already in the catalog.',
+        'id'        => $existing->id,
+      ], 409);
+    }
+
     $id = $db->insert('playwright_tester_files')
       ->fields([
         'filename' => $data['filename'],

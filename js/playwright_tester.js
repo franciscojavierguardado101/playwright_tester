@@ -112,6 +112,8 @@
     wrap.querySelector('#pgt-save').addEventListener('click', async () => {
       if (!currentFile) return;
 
+      const msgEl = wrap.querySelector('#pgt-save-msg');
+
       const res = await fetch('/playwright-tester/save', {
         method: 'POST',
         headers: {
@@ -122,8 +124,16 @@
       });
 
       const data = await res.json();
+
+      if (data.error === 'duplicate') {
+        msgEl.textContent = '⚠️ This file is already in the catalog.';
+        msgEl.style.color = '#e67e22';
+        return;
+      }
+
       if (data.success) {
-        wrap.querySelector('#pgt-save-msg').textContent = '✅ Saved to catalog!';
+        msgEl.textContent = '✅ Saved to catalog!';
+        msgEl.style.color = '#2d9c5f';
         addToCatalog(wrap, data.id, currentFile.name, currentFile.content);
       }
     });
