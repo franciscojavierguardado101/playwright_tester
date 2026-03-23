@@ -1,0 +1,25 @@
+playwright_tester.page:
+  path: '/playwright-tester'
+  defaults:
+    _controller: '\Drupal\playwright_tester\Controller\PlaywrightTesterController::page'
+    _title: 'Francisco Guardado Playwright Tester'
+  requirements:
+    _permission: 'access content'
+
+playwright_tester.save:
+  path: '/playwright-tester/save'
+  defaults:
+    _controller: '\Drupal\playwright_tester\Controller\PlaywrightTesterController::save'
+    _title: 'Save Spec File'
+  requirements:
+    _permission: 'access content'
+  methods: [POST]
+
+playwright_tester.get:
+  path: '/playwright-tester/get/{id}'
+  defaults:
+    _controller: '\Drupal\playwright_tester\Controller\PlaywrightTesterController::get'
+    _title: 'Get Spec File'
+  requirements:
+    _permission: 'access content'
+    id: '\d+'

@@ -1,0 +1,10 @@
+playwright_tester:
+  version: 1.x
+  css:
+    theme:
+      css/playwright_tester.css: {}
+  js:
+    js/playwright_tester.js: {}
+  dependencies:
+    - core/drupal
+    - core/once

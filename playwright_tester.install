@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * @file
+ * Install and uninstall functions for the Playwright Tester module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function playwright_tester_schema() {
+  $schema['playwright_tester_files'] = [
+    'description' => 'Stores uploaded Playwright spec files.',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'filename' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'content' => [
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
+      ],
+      'created' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+  ];
+  return $schema;
+}

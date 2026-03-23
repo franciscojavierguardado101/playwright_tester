@@ -1,0 +1,32 @@
+<?php
+
+/**
+ * @file
+ * Francisco Guardado Playwright Tester module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function playwright_tester_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.playwright_tester':
+      return '<p>' . t('Francisco Guardado Playwright Tester — upload Playwright spec files to parse and catalog tests.') . '</p>';
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function playwright_tester_theme() {
+  return [
+    'playwright_tester_page' => [
+      'variables' => [
+        'files' => [],
+      ],
+      'template' => 'playwright-tester-page',
+    ],
+  ];
+}

@@ -1,0 +1,7 @@
+name: 'Francisco Guardado Playwright Tester'
+type: module
+description: 'A public Playwright spec file viewer and catalog. Upload spec.js files to parse, display, and catalog tests for everyone to see.'
+core_version_requirement: ^10 || ^11
+package: 'Francisco Universe'
+dependencies:
+  - drupal:node
