@@ -188,3 +188,18 @@
   .pgt-wrap { flex-direction: column; }
   .pgt-right { position: static; flex: none; width: 100%; }
 }
+
+/* ── Catalog item actions ── */
+.pgt-catalog__item-actions {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+  flex-shrink: 0;
+}
+.pgt-btn--download {
+  background: #3498db;
+  color: #fff;
+  padding: .35rem .85rem;
+  font-size: .8rem;
+}
+.pgt-btn--download:hover { background: #2176ae; }

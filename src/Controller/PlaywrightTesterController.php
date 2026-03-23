@@ -16,18 +16,29 @@ class PlaywrightTesterController extends ControllerBase {
    */
   public function page() {
     $db = \Drupal::database();
-    $files = $db->select('playwright_tester_files', 'p')
+    $results = $db->select('playwright_tester_files', 'p')
       ->fields('p', ['id', 'filename', 'created'])
       ->orderBy('created', 'DESC')
       ->execute()
       ->fetchAll();
 
+    // Convert to arrays for Twig.
+    $files = [];
+    foreach ($results as $row) {
+      $files[] = [
+        'id'       => $row->id,
+        'filename' => $row->filename,
+        'created'  => $row->created,
+      ];
+    }
+
     return [
-      '#theme' => 'playwright_tester_page',
-      '#files' => $files,
+      '#theme'    => 'playwright_tester_page',
+      '#files'    => $files,
       '#attached' => [
         'library' => ['playwright_tester/playwright_tester'],
       ],
+      '#cache'    => ['max-age' => 0],
     ];
   }
 

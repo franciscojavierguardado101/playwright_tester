@@ -8,10 +8,9 @@
       <p class="pgt-hero__sub">Upload a Playwright <code>.spec.js</code> file to parse and display its tests.</p>
     </div>
 
-    {# Drop zone #}
     <div class="pgt-dropzone" id="pgt-dropzone">
       <div class="pgt-dropzone__inner">
-        <div class="pgt-dropzone__icon">📂</div>
+        <div class="pgt-dropzone__icon">📄</div>
         <div class="pgt-dropzone__text">Drag & drop a <strong>.spec.js</strong> file here</div>
         <div class="pgt-dropzone__or">or</div>
         <label class="pgt-btn pgt-btn--upload" for="pgt-file-input">Choose File</label>
@@ -19,13 +18,11 @@
       </div>
     </div>
 
-    {# File info bar #}
     <div class="pgt-file-bar" id="pgt-file-bar" style="display:none">
       <span class="pgt-file-bar__name" id="pgt-file-name"></span>
       <button class="pgt-btn pgt-btn--clear" id="pgt-clear">✕ Clear</button>
     </div>
 
-    {# Terminal output #}
     <div class="pgt-terminal" id="pgt-terminal" style="display:none">
       <div class="pgt-terminal__bar">
         <span class="pgt-terminal__dot pgt-terminal__dot--red"></span>
@@ -37,7 +34,6 @@
       <div class="pgt-terminal__footer" id="pgt-terminal-footer"></div>
     </div>
 
-    {# Save button #}
     <div class="pgt-save-wrap" id="pgt-save-wrap" style="display:none">
       <button class="pgt-btn pgt-btn--save" id="pgt-save">💾 Save to Catalog</button>
       <span class="pgt-save-msg" id="pgt-save-msg"></span>
@@ -48,13 +44,13 @@
   {# ── RIGHT PANEL — CATALOG ── #}
   <div class="pgt-right">
     <div class="pgt-catalog-header">
-      <h2 class="pgt-catalog-title">Test Catalog</h2>
+      <h2 class="pgt-catalog-title">📋 Test Catalog</h2>
       <p class="pgt-catalog-sub">Previously uploaded spec files. Click any to view or reparse.</p>
     </div>
 
     <div class="pgt-catalog" id="pgt-catalog">
       {% if files is empty %}
-        <div class="pgt-catalog__empty">No files in the catalog yet. Upload your first spec file!</div>
+        <div class="pgt-catalog__empty" id="pgt-catalog-empty">No files in the catalog yet. Upload your first spec file!</div>
       {% else %}
         {% for file in files %}
           <div class="pgt-catalog__item" data-id="{{ file.id }}">
@@ -63,7 +59,10 @@
               <div class="pgt-catalog__item-name">{{ file.filename }}</div>
               <div class="pgt-catalog__item-date">{{ file.created|date('M j, Y') }}</div>
             </div>
-            <button class="pgt-btn pgt-btn--view" data-id="{{ file.id }}">View</button>
+            <div class="pgt-catalog__item-actions">
+              <button class="pgt-btn pgt-btn--view" data-id="{{ file.id }}">View</button>
+              <button class="pgt-btn pgt-btn--download" data-id="{{ file.id }}" data-filename="{{ file.filename }}">⬇ Download</button>
+            </div>
           </div>
         {% endfor %}
       {% endif %}

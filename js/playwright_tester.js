@@ -12,10 +12,8 @@
     }
   };
 
-  // ── Current file state ────────────────────────────────────
   let currentFile = null;
 
-  // ── Drop zone ─────────────────────────────────────────────
   function initDropzone(wrap) {
     const zone  = wrap.querySelector('#pgt-dropzone');
     const input = wrap.querySelector('#pgt-file-input');
@@ -31,14 +29,12 @@
       const file = e.dataTransfer.files[0];
       if (file) handleFile(wrap, file);
     });
-
     zone.addEventListener('click', () => input.click());
     input.addEventListener('change', () => {
       if (input.files[0]) handleFile(wrap, input.files[0]);
     });
   }
 
-  // ── Handle uploaded file ──────────────────────────────────
   function handleFile(wrap, file) {
     const reader = new FileReader();
     reader.onload = e => {
@@ -51,14 +47,12 @@
     reader.readAsText(file);
   }
 
-  // ── Show file bar ─────────────────────────────────────────
   function showFileBar(wrap, name) {
     wrap.querySelector('#pgt-file-name').textContent = '📄 ' + name;
     wrap.querySelector('#pgt-file-bar').style.display = '';
     wrap.querySelector('#pgt-dropzone').style.display = 'none';
   }
 
-  // ── Clear ─────────────────────────────────────────────────
   function initClear(wrap) {
     wrap.querySelector('#pgt-clear').addEventListener('click', () => {
       currentFile = null;
@@ -70,7 +64,6 @@
     });
   }
 
-  // ── Parse spec file ───────────────────────────────────────
   function parseAndRender(wrap, filename, content) {
     const lines   = content.split('\n');
     const results = [];
@@ -79,23 +72,15 @@
 
     lines.forEach(line => {
       const trimmed = line.trim();
-
-      // Detect describe block
       const descMatch = trimmed.match(/test\.describe\s*\(\s*['"`](.+?)['"`]/);
       if (descMatch) { suite = descMatch[1]; return; }
-
-      // Detect test
       const testMatch = trimmed.match(/^\s*test\s*\(\s*['"`](.+?)['"`]/);
-      if (testMatch) {
-        count++;
-        results.push({ suite, name: testMatch[1], num: count });
-      }
+      if (testMatch) { count++; results.push({ suite, name: testMatch[1], num: count }); }
     });
 
     renderTerminal(wrap, filename, suite, results);
   }
 
-  // ── Render terminal output ────────────────────────────────
   function renderTerminal(wrap, filename, suite, results) {
     const terminal = wrap.querySelector('#pgt-terminal');
     const body     = wrap.querySelector('#pgt-terminal-body');
@@ -105,13 +90,11 @@
     title.textContent = filename;
     body.innerHTML = '';
 
-    // Suite header
     const suiteEl = document.createElement('div');
     suiteEl.className = 'pgt-line--suite';
     suiteEl.textContent = '  ' + suite;
     body.appendChild(suiteEl);
 
-    // Test lines
     results.forEach(r => {
       const line = document.createElement('div');
       line.innerHTML =
@@ -121,13 +104,10 @@
       body.appendChild(line);
     });
 
-    // Footer
     footer.textContent = `  ${results.length} tests found in ${suite}`;
-
     terminal.style.display = '';
   }
 
-  // ── Save to catalog ───────────────────────────────────────
   function initSave(wrap) {
     wrap.querySelector('#pgt-save').addEventListener('click', async () => {
       if (!currentFile) return;
@@ -138,22 +118,18 @@
           'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
         },
-        body: JSON.stringify({
-          filename: currentFile.name,
-          content:  currentFile.content,
-        }),
+        body: JSON.stringify({ filename: currentFile.name, content: currentFile.content }),
       });
 
       const data = await res.json();
       if (data.success) {
         wrap.querySelector('#pgt-save-msg').textContent = '✅ Saved to catalog!';
-        addToCatalog(wrap, data.id, currentFile.name);
+        addToCatalog(wrap, data.id, currentFile.name, currentFile.content);
       }
     });
   }
 
-  // ── Add item to catalog dynamically ──────────────────────
-  function addToCatalog(wrap, id, filename) {
+  function addToCatalog(wrap, id, filename, content) {
     const catalog = wrap.querySelector('#pgt-catalog');
     const empty   = catalog.querySelector('.pgt-catalog__empty');
     if (empty) empty.remove();
@@ -167,20 +143,25 @@
         <div class="pgt-catalog__item-name">${filename}</div>
         <div class="pgt-catalog__item-date">Just now</div>
       </div>
-      <button class="pgt-btn pgt-btn--view" data-id="${id}">View</button>
+      <div class="pgt-catalog__item-actions">
+        <button class="pgt-btn pgt-btn--view" data-id="${id}">View</button>
+        <button class="pgt-btn pgt-btn--download" data-id="${id}" data-filename="${filename}">⬇ Download</button>
+      </div>
     `;
     item.querySelector('.pgt-btn--view').addEventListener('click', () => loadFromCatalog(wrap, id));
+    item.querySelector('.pgt-btn--download').addEventListener('click', () => downloadFile(filename, content));
     catalog.prepend(item);
   }
 
-  // ── Catalog — load existing files ────────────────────────
   function initCatalog(wrap) {
     wrap.querySelectorAll('.pgt-btn--view').forEach(btn => {
       btn.addEventListener('click', () => loadFromCatalog(wrap, btn.dataset.id));
     });
+    wrap.querySelectorAll('.pgt-btn--download').forEach(btn => {
+      btn.addEventListener('click', () => downloadFromCatalog(btn.dataset.id, btn.dataset.filename));
+    });
   }
 
-  // ── Load file from catalog ────────────────────────────────
   async function loadFromCatalog(wrap, id) {
     const res  = await fetch(`/playwright-tester/get/${id}`);
     const data = await res.json();
@@ -192,6 +173,22 @@
     wrap.querySelector('#pgt-save-wrap').style.display = 'none';
     wrap.querySelector('#pgt-dropzone').style.display = 'none';
     wrap.querySelector('#pgt-file-bar').style.display = '';
+  }
+
+  async function downloadFromCatalog(id, filename) {
+    const res  = await fetch(`/playwright-tester/get/${id}`);
+    const data = await res.json();
+    if (data.error) return;
+    downloadFile(data.filename, data.content);
+  }
+
+  function downloadFile(filename, content) {
+    const blob = new Blob([content], { type: 'text/javascript' });
+    const a    = document.createElement('a');
+    a.href     = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
   }
 
 })(Drupal, once);
